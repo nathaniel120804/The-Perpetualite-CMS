@@ -23,9 +23,10 @@ async function fetchArticles() {
     try {
         const res = await fetch(API_URL);
         const data = await res.json();
+        console.log('Fetched articles:', data);
         return Array.isArray(data) ? data : [];
     } catch (err) {
-        console.error(err);
+        console.error('Fetch error:', err);
         showNotification('Failed to fetch articles', true);
         return [];
     }
@@ -46,6 +47,8 @@ async function addArticle() {
         trending: document.getElementById('articleTrending').checked ? 'yes' : 'no'
     };
 
+    console.log('Adding article:', article);
+
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
@@ -53,40 +56,47 @@ async function addArticle() {
             body: JSON.stringify(article)
         });
         const result = await res.json();
+        console.log('Add response:', result);
+        
         if (result.status === 'success') {
             showNotification('Article added successfully!');
             document.getElementById('articleForm').reset();
             loadDashboard();
             loadArticlesList();
         } else {
-            showNotification('Failed to add article', true);
+            showNotification('Failed to add article: ' + (result.message || 'Unknown error'), true);
         }
     } catch (err) {
-        console.error(err);
-        showNotification('Error adding article', true);
+        console.error('Add error:', err);
+        showNotification('Error adding article: ' + err.message, true);
     }
 }
 
 // Delete article
 async function deleteArticle(id) {
     if (!confirm('Are you sure you want to delete this article?')) return;
+    
+    console.log('Deleting article with ID:', id);
+    
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id })
+            body: JSON.stringify({ action: 'delete', id: id })
         });
         const result = await res.json();
+        console.log('Delete response:', result);
+        
         if (result.status === 'success') {
             showNotification('Article deleted successfully!');
             loadDashboard();
             loadArticlesList();
         } else {
-            showNotification('Failed to delete article', true);
+            showNotification('Failed to delete article: ' + (result.message || 'Unknown error'), true);
         }
     } catch (err) {
-        console.error(err);
-        showNotification('Error deleting article', true);
+        console.error('Delete error:', err);
+        showNotification('Error deleting article: ' + err.message, true);
     }
 }
 
@@ -120,5 +130,3 @@ async function loadArticlesList() {
 
 // Initial load
 showTab('dashboard');
-
-
