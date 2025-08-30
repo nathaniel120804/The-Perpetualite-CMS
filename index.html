@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perpetualite CMS</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>Perpetualite CMS</h1>
+    <nav>
+        <button onclick="showTab('dashboard')">Dashboard</button>
+        <button onclick="showTab('manage')">Manage Articles</button>
+        <button onclick="showTab('add')">Add Article</button>
+    </nav>
+</header>
+
+<main>
+    <!-- Dashboard -->
+    <section id="dashboardTab" class="tab">
+        <h2>Dashboard</h2>
+        <div id="dashboardCounts"></div>
+        <div id="recentArticles"></div>
+    </section>
+
+    <!-- Manage Articles -->
+    <section id="manageTab" class="tab" style="display:none">
+        <h2>Manage Articles</h2>
+        <div id="articlesList"></div>
+    </section>
+
+    <!-- Add Article -->
+    <section id="addTab" class="tab" style="display:none">
+        <h2>Add Article</h2>
+        <form id="articleForm" onsubmit="event.preventDefault(); addArticle();">
+            <label>Title: <input id="articleTitle" required></label>
+            <label>Excerpt: <input id="articleExcerpt" required></label>
+            <label>Author: <input id="articleAuthor" required></label>
+            <label>Category: <input id="articleCategory" required></label>
+            <label>Date: <input id="articleDate" type="date"></label>
+            <label>Image URL: <input id="articleImage"></label>
+            <label>Tags: <input id="articleTags"></label>
+            <label>Content: <textarea id="articleContent" required></textarea></label>
+            <label>Trending: <input type="checkbox" id="articleTrending"></label>
+            <button type="submit">Save Article</button>
+        </form>
+    </section>
+</main>
+
+<div id="notification"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
