@@ -20,29 +20,79 @@
     <!-- Dashboard -->
     <section id="dashboardTab" class="tab">
         <h2>Dashboard</h2>
-        <div id="dashboardCounts"></div>
+        <div class="auth-prompt" id="authPrompt" style="display: none;">
+            <p>⚠️ Authentication required! Please <a href="#" id="authLink">authorize the app</a> to enable adding and deleting articles.</p>
+        </div>
+        <div id="dashboardCounts">
+            <div class="count-card">
+                <h3 id="totalArticles">0</h3>
+                <p>Total Articles</p>
+            </div>
+            <div class="count-card">
+                <h3 id="trendingArticles">0</h3>
+                <p>Trending Articles</p>
+            </div>
+            <div class="count-card">
+                <h3 id="recentCount">0</h3>
+                <p>Recent Articles</p>
+            </div>
+        </div>
+        <h3>Recent Articles</h3>
         <div id="recentArticles"></div>
     </section>
 
     <!-- Manage Articles -->
     <section id="manageTab" class="tab" style="display:none">
         <h2>Manage Articles</h2>
+        <div class="auth-prompt" id="manageAuthPrompt" style="display: none;">
+            <p>⚠️ Authentication required! Please <a href="#" id="manageAuthLink">authorize the app</a> to enable deleting articles.</p>
+        </div>
         <div id="articlesList"></div>
     </section>
 
     <!-- Add Article -->
     <section id="addTab" class="tab" style="display:none">
         <h2>Add Article</h2>
-        <form id="articleForm" onsubmit="event.preventDefault(); addArticle();">
-            <label>Title: <input id="articleTitle" required></label>
-            <label>Excerpt: <input id="articleExcerpt" required></label>
-            <label>Author: <input id="articleAuthor" required></label>
-            <label>Category: <input id="articleCategory" required></label>
-            <label>Date: <input id="articleDate" type="date"></label>
-            <label>Image URL: <input id="articleImage"></label>
-            <label>Tags: <input id="articleTags"></label>
-            <label>Content: <textarea id="articleContent" required></textarea></label>
-            <label>Trending: <input type="checkbox" id="articleTrending"></label>
+        <div class="auth-prompt" id="addAuthPrompt" style="display: none;">
+            <p>⚠️ Authentication required! Please <a href="#" id="addAuthLink">authorize the app</a> to enable adding articles.</p>
+        </div>
+        <form id="articleForm">
+            <label>
+                <span>Title</span>
+                <input id="articleTitle" required>
+            </label>
+            <label>
+                <span>Author</span>
+                <input id="articleAuthor" required>
+            </label>
+            <label>
+                <span>Category</span>
+                <input id="articleCategory" required>
+            </label>
+            <label>
+                <span>Date</span>
+                <input id="articleDate" type="date">
+            </label>
+            <label>
+                <span>Image URL</span>
+                <input id="articleImage">
+            </label>
+            <label>
+                <span>Tags (comma separated)</span>
+                <input id="articleTags">
+            </label>
+            <label>
+                <span>Excerpt</span>
+                <textarea id="articleExcerpt" required></textarea>
+            </label>
+            <label id="articleContent">
+                <span>Content</span>
+                <textarea id="articleContent" required></textarea>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" id="articleTrending">
+                <span>Mark as Trending</span>
+            </label>
             <button type="submit">Save Article</button>
         </form>
     </section>
@@ -53,3 +103,4 @@
 <script src="app.js"></script>
 </body>
 </html>
+
