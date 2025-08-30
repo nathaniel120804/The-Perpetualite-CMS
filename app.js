@@ -1,7 +1,7 @@
 const API_URL = 'https://script.google.com/macros/s/AKfycbx6_ROHGXnTko2lXNSG1-heeiY1E-Gl_Uvv2uu6z49jqPEpUNnqvf75y-djPem3y1y1/exec';
 let articles = [];
 
-// Show Tab
+// Tab navigation
 function showTab(tab) {
     document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
     document.getElementById(tab + 'Tab').style.display = 'block';
@@ -18,7 +18,7 @@ function showNotification(message, error = false) {
     setTimeout(() => notif.style.display = 'none', 3000);
 }
 
-// Fetch Articles
+// Fetch articles
 async function fetchArticles() {
     try {
         const res = await fetch(API_URL);
@@ -31,10 +31,22 @@ async function fetchArticles() {
     }
 }
 
-// Save Article
-async function saveArticle(article) {
+// Add article
+async function addArticle() {
+    const article = {
+        id: Date.now(),
+        title: document.getElementById('articleTitle').value,
+        excerpt: document.getElementById('articleExcerpt').value,
+        author: document.getElementById('articleAuthor').value,
+        category: document.getElementById('articleCategory').value,
+        date: document.getElementById('articleDate').value || new Date().toISOString().split('T')[0],
+        image: document.getElementById('articleImage').value,
+        tags: document.getElementById('articleTags').value,
+        content: document.getElementById('articleContent').value,
+        trending: document.getElementById('articleTrending').checked ? 'yes' : 'no'
+    };
+
     try {
-        // Flatten the article object to match sheet columns
         const res = await fetch(API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -42,20 +54,20 @@ async function saveArticle(article) {
         });
         const result = await res.json();
         if (result.status === 'success') {
-            showNotification('Article saved successfully!');
-            return true;
+            showNotification('Article added successfully!');
+            document.getElementById('articleForm').reset();
+            loadDashboard();
+            loadArticlesList();
         } else {
-            showNotification('Failed to save article', true);
-            return false;
+            showNotification('Failed to add article', true);
         }
     } catch (err) {
         console.error(err);
-        showNotification('Error saving article', true);
-        return false;
+        showNotification('Error adding article', true);
     }
 }
 
-// Delete Article
+// Delete article
 async function deleteArticle(id) {
     if (!confirm('Are you sure you want to delete this article?')) return;
     try {
@@ -78,7 +90,7 @@ async function deleteArticle(id) {
     }
 }
 
-// Load Dashboard
+// Load dashboard
 async function loadDashboard() {
     articles = await fetchArticles();
     document.getElementById('dashboardCounts').innerHTML = `
@@ -94,7 +106,7 @@ async function loadDashboard() {
     `).join('');
 }
 
-// Load Manage Articles
+// Load articles for management
 async function loadArticlesList() {
     articles = await fetchArticles();
     document.getElementById('articlesList').innerHTML = articles.map(a => `
@@ -106,28 +118,7 @@ async function loadArticlesList() {
     `).join('');
 }
 
-// Add Article
-async function addArticle() {
-    const article = {
-        id: Date.now(),
-        title: document.getElementById('articleTitle').value,
-        excerpt: document.getElementById('articleExcerpt').value,
-        author: document.getElementById('articleAuthor').value,
-        category: document.getElementById('articleCategory').value,
-        date: document.getElementById('articleDate').value || new Date().toISOString().split('T')[0],
-        image: document.getElementById('articleImage').value,
-        tags: document.getElementById('articleTags').value,
-        content: document.getElementById('articleContent').value,
-        trending: document.getElementById('articleTrending').checked ? 'yes' : 'no'
-    };
-
-    const success = await saveArticle(article);
-    if (success) {
-        document.getElementById('articleForm').reset();
-        showTab('dashboard');
-    }
-}
-
-// Initial Load
+// Initial load
 showTab('dashboard');
+
 
