@@ -1,36 +1,17 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbx6_ROHGXnTko2lXNSG1-heeiY1E-Gl_Uvv2uu6z49jqPEpUNnqvf75y-djPem3y1y1/exec';
-let articles = [];
+const API_URL = "https://script.google.com/macros/s/AKfycbx6_ROHGXnTko2lXNSG1-heeiY1E-Gl_Uvv2uu6z49jqPEpUNnqvf75y-djPem3y1y1/exec";
 
-function showTab(tab) {
-    document.querySelectorAll('.tab').forEach(t => t.style.display = 'none');
-    document.getElementById(tab + 'Tab').style.display = 'block';
-    if (tab === 'dashboard') loadDashboard();
-    if (tab === 'manage') loadArticlesList();
-}
-
-// Notifications
-function showNotification(message, error = false) {
-    const notif = document.getElementById('notification');
-    notif.textContent = message;
-    notif.style.backgroundColor = error ? '#ff4d4f' : '#52c41a';
-    notif.style.display = 'block';
-    setTimeout(() => notif.style.display = 'none', 3000);
-}
-
-// Fetch Articles
+// Fetch all articles
 async function fetchArticles() {
     try {
-        const res = await fetch(`${API_URL}?action=getArticles`);
+        const res = await fetch(API_URL);
         const data = await res.json();
-        return Array.isArray(data) ? data : [];
+        renderArticles(data);
     } catch (err) {
-        console.error(err);
-        showNotification('Failed to fetch articles', true);
-        return [];
+        console.error("Error fetching articles:", err);
     }
 }
 
-// Save Article
+// Save a new article
 async function saveArticle(article) {
     try {
         const res = await fetch(API_URL, {
@@ -39,23 +20,19 @@ async function saveArticle(article) {
             body: JSON.stringify({ action: 'saveArticle', article })
         });
         const result = await res.json();
-        if (result.status === 'success') {
-            showNotification('Article saved successfully!');
-            return true;
+        if (result.status === "success") {
+            fetchArticles(); // Refresh list
+            console.log("Article saved!");
         } else {
-            showNotification('Failed to save article', true);
-            return false;
+            console.error("Save failed:", result.message);
         }
     } catch (err) {
-        console.error(err);
-        showNotification('Error saving article', true);
-        return false;
+        console.error("Error saving article:", err);
     }
 }
 
-// Delete Article
+// Delete an article by ID
 async function deleteArticle(id) {
-    if (!confirm('Are you sure you want to delete this article?')) return;
     try {
         const res = await fetch(API_URL, {
             method: 'POST',
@@ -63,68 +40,51 @@ async function deleteArticle(id) {
             body: JSON.stringify({ action: 'deleteArticle', id })
         });
         const result = await res.json();
-        if (result.status === 'success') {
-            showNotification('Article deleted successfully!');
-            loadDashboard();
-            loadArticlesList();
+        if (result.status === "success") {
+            fetchArticles(); // Refresh list
+            console.log("Article deleted!");
         } else {
-            showNotification('Failed to delete article', true);
+            console.error("Delete failed:", result.message);
         }
     } catch (err) {
-        console.error(err);
-        showNotification('Error deleting article', true);
+        console.error("Error deleting article:", err);
     }
 }
 
-// Load Dashboard
-async function loadDashboard() {
-    articles = await fetchArticles();
-    document.getElementById('dashboardCounts').innerHTML = `
-        <p>Total Articles: ${articles.length}</p>
-        <p>Trending Articles: ${articles.filter(a => a.trending === 'yes').length}</p>
-    `;
-    const recent = articles.slice(-5).reverse();
-    document.getElementById('recentArticles').innerHTML = recent.map(a => `
-        <div class="article-card">
-            <h3>${a.title}</h3>
-            <p>${a.excerpt}</p>
-        </div>
-    `).join('');
+// Render articles to the page
+function renderArticles(articles) {
+    const container = document.getElementById("articlesContainer");
+    container.innerHTML = "";
+    articles.forEach(article => {
+        const div = document.createElement("div");
+        div.classList.add("article-card");
+        div.innerHTML = `
+            <h3>${article.title}</h3>
+            <p>${article.excerpt}</p>
+            <p><strong>Author:</strong> ${article.author}</p>
+            <p><strong>Category:</strong> ${article.category}</p>
+            <button onclick="deleteArticle('${article.id}')">Delete</button>
+        `;
+        container.appendChild(div);
+    });
 }
 
-// Load Manage Articles
-async function loadArticlesList() {
-    articles = await fetchArticles();
-    document.getElementById('articlesList').innerHTML = articles.map(a => `
-        <div class="article-card">
-            <h3>${a.title}</h3>
-            <p>${a.excerpt}</p>
-            <button onclick="deleteArticle(${a.id})">Delete</button>
-        </div>
-    `).join('');
-}
-
-// Add Article
-async function addArticle() {
+// Example usage
+document.getElementById("saveBtn").addEventListener("click", () => {
     const article = {
-        id: Date.now(),
-        title: document.getElementById('articleTitle').value,
-        excerpt: document.getElementById('articleExcerpt').value,
-        author: document.getElementById('articleAuthor').value,
-        category: document.getElementById('articleCategory').value,
-        date: document.getElementById('articleDate').value || new Date().toISOString().split('T')[0],
-        image: document.getElementById('articleImage').value,
-        tags: document.getElementById('articleTags').value,
-        content: document.getElementById('articleContent').value,
-        trending: document.getElementById('articleTrending').checked ? 'yes' : 'no'
+        id: Date.now().toString(),
+        title: document.getElementById("title").value,
+        excerpt: document.getElementById("excerpt").value,
+        author: document.getElementById("author").value,
+        category: document.getElementById("category").value,
+        date: new Date().toLocaleDateString(),
+        image: document.getElementById("image").value || "",
+        tags: document.getElementById("tags").value || "",
+        content: document.getElementById("content").value || "",
+        trending: false
     };
+    saveArticle(article);
+});
 
-    const success = await saveArticle(article);
-    if (success) {
-        document.getElementById('articleForm').reset();
-        showTab('dashboard');
-    }
-}
-
-// Initial Load
-showTab('dashboard');
+// Load articles on page load
+window.addEventListener("DOMContentLoaded", fetchArticles);
