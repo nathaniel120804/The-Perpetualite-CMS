@@ -53,3 +53,33 @@
 <script src="app.js"></script>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Perpetualite — Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Admin Panel — Manage Articles</h1>
+
+  <!-- Form for adding articles -->
+  <form id="articleForm">
+    <input type="text" id="title" placeholder="Title" required><br>
+    <textarea id="excerpt" placeholder="Excerpt" required></textarea><br>
+    <input type="text" id="author" placeholder="Author" required><br>
+    <input type="text" id="category" placeholder="Category (e.g. news)" required><br>
+    <input type="url" id="image" placeholder="Image URL"><br>
+    <input type="text" id="tags" placeholder="Tags (comma separated)"><br>
+    <textarea id="content" placeholder="Full Content" required></textarea><br>
+    <button type="submit" id="saveBtn">Save Article</button>
+  </form>
+
+  <h2>Saved Articles</h2>
+  <div id="articlesContainer"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
